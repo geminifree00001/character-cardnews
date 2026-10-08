@@ -238,6 +238,25 @@ function openSettings() {
   $('settings-modal').hidden = false;
 }
 
+/* ---------- 메인 화면 Gemini 키 박스 ---------- */
+function saveApiKey(v) {
+  S.apiKey = (v || '').trim();
+  try { localStorage.setItem('ccn_api_key', S.apiKey); } catch (e) {}
+  $('api-key').value = S.apiKey;
+  $('api-key-main').value = '';
+  refreshKeyBox();
+}
+function refreshKeyBox() {
+  const has = !!S.apiKey;
+  $('key-input-row').hidden = has;
+  $('key-done-row').hidden = !has;
+  $('key-box').classList.toggle('done', has);
+  if (has) {
+    const tail = S.apiKey.slice(-4);
+    $('key-status').textContent = `✅ 키 등록됨 (••••${tail})`;
+  }
+}
+
 /* ---------- 처음 설정 모달 ---------- */
 function setupTab(name) {
   $$('.setup-tab').forEach((b) => b.classList.toggle('active', b.dataset.stab === name));
@@ -896,13 +915,27 @@ function init() {
   on('btn-settings', 'click', openSettings);
   on('btn-close-settings', 'click', () => { $('settings-modal').hidden = true; });
   on('btn-save-key', 'click', () => {
-    S.apiKey = $('api-key').value.trim();
-    try { localStorage.setItem('ccn_api_key', S.apiKey); } catch (e) {}
+    saveApiKey($('api-key').value);
     $('settings-modal').hidden = true;
     alert('저장됐어요.');
   });
+  on('btn-save-key-main', 'click', () => {
+    const v = $('api-key-main').value.trim();
+    if (!v) { alert('키를 입력해주세요.'); return; }
+    saveApiKey(v);
+    alert('저장됐어요.');
+  });
+  $('api-key-main').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('btn-save-key-main').click(); });
+  on('btn-change-key', 'click', () => {
+    $('api-key-main').value = S.apiKey;
+    $('key-input-row').hidden = false;
+    $('key-done-row').hidden = true;
+    $('key-box').classList.remove('done');
+    $('api-key-main').focus();
+  });
   initSetup();
   buildShapeGrid();
+  refreshKeyBox();
   initMain();
   initTopics();
   initSummary();
