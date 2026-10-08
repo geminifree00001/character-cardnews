@@ -181,13 +181,24 @@
       <div id="sum-title" class="sum-title"></div>
       <p id="sum-reason" class="sum-reason"></p>
     </div>
-    <button id="btn-draw9" class="btn-blue big wide">🎨 그림 9장 한 번에 그리기</button>
+    <div class="card">
+      <div class="pagecount-label">📄 장수 선택</div>
+      <div class="pagecount-row" id="pagecount-row">
+        <button class="pc-btn" data-n="4">4장</button>
+        <button class="pc-btn" data-n="6">6장</button>
+        <button class="pc-btn" data-n="8">8장</button>
+        <button class="pc-btn on" data-n="9">9장</button>
+        <button class="pc-btn" data-n="10">10장</button>
+      </div>
+      <p class="hint">마지막 장에는 팔로우 유도 이미지가 들어가요.</p>
+    </div>
+    <button id="btn-draw" class="btn-blue big wide">🎨 그림 9장 한 번에 그리기</button>
     <p class="hint center">글자는 아래에서 바로 고칠 수 있어요. 고치면 그림에 바로 반영돼요.</p>
     <div id="sum-loading" class="loading-black" hidden>○ 글을 쓰고 있어요... (2~3분 걸려요. 창을 닫지 마세요)</div>
     <div class="row"><button id="btn-back-topics" class="btn-ghost">← 주제로 돌아가기</button></div>
   </section>
 
-  <!-- ============ 카드뉴스 편집 (9장) ============ -->
+  <!-- ============ 카드뉴스 편집 ============ -->
   <section id="view-editor" class="view" hidden>
     <header class="editor-head">
       <div class="brand">캐릭터 카드뉴스 만들기</div>
