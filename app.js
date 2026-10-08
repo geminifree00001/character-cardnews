@@ -19,8 +19,9 @@ const S = {
   topic: null,        // {format, title, hook, reason, desc}
   shape: null,        // SHAPES 항목
   field: '',          // 분야 (2~4자)
-  cards: [],          // 9개: {title, desc, scene, img, imgEl, bg, hlS, hlE, stamp, gen}
+  cards: [],          // {title, desc, scene, img, imgEl, bg, hlS, hlE, stamp, gen}
   page: 0,
+  pageCount: 9,       // 선택한 장수 (4/6/8/9/10)
   hlMode: false,
   charDraft: null,
   busy: false,
@@ -217,13 +218,14 @@ const PROMPT_SHAPE_REASON = (topic, shape) =>
 조건: 번역투·기계체 금지, 한국 인스타 바이럴 채널의 자연스러운 구어체.
 이유만 답하고 다른 말은 쓰지 마.`;
 
-const PROMPT_PLAN = (topic, shape) =>
-`다음 카드뉴스의 9장 구성을 만들어줘.
+const PROMPT_PLAN = (topic, shape, n) =>
+`다음 카드뉴스의 ${n}장 구성을 만들어줘.
 주제: ${topic.title} - ${topic.desc || ''}
 모양: ${shape.label} (${shape.sub})
 조건:
-- 1장은 표지(주제가 한눈에 들어오게), 9장은 마무리(저장·공유 유도)
+- 1장은 표지(주제가 한눈에 들어오게), 마지막 ${n}장은 팔로우 유도 마무리(팔로우·저장·공유 요청을 따뜻하고 자연스럽게)
 - 각 장마다: scene(캐릭터가 등장하는 일러스트 장면, 구체적으로 1~2문장), title(큰 제목, 15자 이내 후킹 문구), desc(아래 작은 설명, 1~2문장 구어체)
+- 마지막 장의 scene은 캐릭터가 팔로우를 유도하는 장면으로 해줘
 - title에서 가장 강조할 단어는 [[ ]]로 감싸줘. 예: [[감기약]] 이렇게 먹으면 위험해요
 - 번역투 금지, 한국 인스타 바이럴 채널의 자연스러운 구어체
 - 맨 마지막에 "field"로 이 주제의 분야를 2~4자로 적어줘. 예: 건강정보
@@ -231,6 +233,17 @@ const PROMPT_PLAN = (topic, shape) =>
 {"field":"분야","cards":[
   {"scene":"장면 설명","title":"큰 제목","desc":"작은 설명"}
 ]}`;
+
+/* 마지막 장: 팔로우 유도 이미지 (캐릭터 스타일에 어울리게) */
+const FOLLOW_IMG_PROMPT = (ch) =>
+`카드뉴스 마지막 장용 세로형 일러스트.
+장면: 등장 캐릭터가 밝게 웃으며 한 손으로 화면 위쪽의 '팔로우' 버튼을 가리키고 있다. 주변에 작은 하트와 별 장식이 흩어져 있다. 따뜻하고 사랑스러운 분위기.
+${ch && ch.desc ? '등장 캐릭터 설명: ' + ch.desc + '\n' : ''}등장 캐릭터: 레퍼런스 이미지의 캐릭터
+조건: 캐릭터의 생김새·색상·분위기는 레퍼런스 이미지와 똑같이 유지. 밝고 귀여운 분위기, 세로 3:4 구도, 텍스트·글자·워터마크 절대 금지.`;
+
+const isLastCard = (idx) => S.cards.length > 0 && idx === S.cards.length - 1;
+const imgPromptFor = (card, idx, ch) =>
+  isLastCard(idx) ? FOLLOW_IMG_PROMPT(ch) : CARD_IMG_PROMPT(card.scene, ch);
 
 /* ---------- 설정 모달 ---------- */
 function openSettings() {
@@ -501,11 +514,19 @@ async function gotoSummary(topic) {
 function initSummary() {
   on('btn-back-topics', 'click', () => showView('view-topics'));
   on('btn-settings2', 'click', openSettings);
-  on('btn-draw9', 'click', async () => {
+  /* 장수 선택 */
+  $$('#pagecount-row .pc-btn').forEach((b) => {
+    b.addEventListener('click', () => {
+      S.pageCount = parseInt(b.dataset.n, 10) || 9;
+      $$('#pagecount-row .pc-btn').forEach((x) => x.classList.toggle('on', x === b));
+      $('btn-draw').textContent = `🎨 그림 ${S.pageCount}장 한 번에 그리기`;
+    });
+  });
+  on('btn-draw', 'click', async () => {
     if (S.busy) return;
     S.busy = true;
     $('sum-loading').hidden = false;
-    const btn = $('btn-draw9');
+    const btn = $('btn-draw');
     btn.disabled = true;
     try {
       await buildCards();
@@ -517,12 +538,13 @@ function initSummary() {
   });
 }
 
-/* ---------- 9장 구성 생성 ---------- */
+/* ---------- 카드 구성 생성 ---------- */
 async function buildCards() {
-  const t = await geminiText(PROMPT_PLAN(S.topic, S.shape));
+  const n = S.pageCount;
+  const t = await geminiText(PROMPT_PLAN(S.topic, S.shape, n));
   const j = parseJsonLoose(t);
-  const arr = (j.cards || []).slice(0, 9);
-  if (arr.length < 9) throw new Error('9장 구성을 받지 못했어요');
+  const arr = (j.cards || []).slice(0, n);
+  if (arr.length < n) throw new Error(n + '장 구성을 받지 못했어요');
   S.field = (j.field || '').slice(0, 6);
   S.cards = arr.map((c) => ({
     title: c.title || '', desc: c.desc || '', scene: c.scene || '',
@@ -544,9 +566,9 @@ async function generateCardImages() {
     if (card.img) continue;
     card.gen = true;
     if (i === S.page) renderPreview();
-    bar.textContent = `🖼 ${i + 1}번째 장 그림 그리는 중... (${i + 1}/9)`;
+    bar.textContent = `🖼 ${i + 1}번째 장 그림 그리는 중... (${i + 1}/${S.pageCount})`;
     try {
-      const url = await geminiImage(CARD_IMG_PROMPT(card.scene, ch), ch ? ch.dataUrl : null);
+      const url = await geminiImage(imgPromptFor(card, i, ch), ch ? ch.dataUrl : null);
       card.img = await downscaleImage(url, 1080);
       card.imgEl = null;
     } catch (e) { card.img = null; /* 실패한 장은 나중에 [그림 다시 그리기] */ }
@@ -753,7 +775,7 @@ function buildBgColors(card) {
 function buildDots() {
   const w = $('page-dots');
   w.innerHTML = '';
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < S.pageCount; i++) {
     const d = document.createElement('span');
     d.className = 'dot' + (i === S.page ? ' on' : '');
     w.appendChild(d);
@@ -763,13 +785,13 @@ function buildDots() {
 function renderPage() {
   const card = S.cards[S.page];
   if (!card) return;
-  $('page-label').textContent = `${S.page + 1}번째 장 / 9장`;
+  $('page-label').textContent = `${S.page + 1}번째 장 / ${S.pageCount}장`;
   buildDots();
   $('in-title').value = card.title;
   $('in-desc').value = card.desc;
   $('in-stamp').value = card.stamp || '';
   $('btn-prev').disabled = S.page === 0;
-  $('btn-next').disabled = S.page === 8;
+  $('btn-next').disabled = S.page === S.cards.length - 1;
   $('btn-redraw').textContent = card.img ? '🔄 그림 다시 그리기' : '🎨 이 장 그림 그리기';
   buildBgColors(card);
   $('scene-hint').textContent = card.scene ? ('그림 설명: ' + card.scene) : '';
@@ -818,7 +840,7 @@ function initEditor() {
     btn.textContent = '그리는 중...';
     card.gen = true; renderPreview();
     try {
-      const url = await geminiImage(CARD_IMG_PROMPT(card.scene, ch), ch ? ch.dataUrl : null);
+      const url = await geminiImage(imgPromptFor(card, S.page, ch), ch ? ch.dataUrl : null);
       card.img = await downscaleImage(url, 1080);
       card.imgEl = null;
     } catch (e) { alert('그리기 실패: ' + e.message); }
@@ -865,7 +887,7 @@ function initEditor() {
       const blob = await zip.generateAsync({ type: 'blob' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = '캐릭터카드뉴스-9장.zip';
+      a.download = `캐릭터카드뉴스-${S.cards.length}장.zip`;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 5000);
     } catch (e) { alert('전체 저장 실패: ' + e.message); }
