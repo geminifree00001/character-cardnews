@@ -70,6 +70,15 @@ main{padding:26px;max-width:1100px;margin:0 auto}
 
 /* 준비 박스 */
 .prep-box{background:#fff;border-radius:var(--radius);padding:22px;box-shadow:0 4px 18px rgba(120,90,20,.06);margin-bottom:18px}
+
+/* Gemini 키 박스 */
+.key-box{background:#fffbe8;border:2px solid #f5d547;border-radius:var(--radius);padding:18px 22px;box-shadow:0 4px 18px rgba(120,90,20,.08);margin-bottom:18px}
+.key-box.done{background:#f0faf1;border-color:#9ed6a5}
+.key-title{font-size:17px;font-weight:800;margin-bottom:12px}
+.key-input{border:2px solid #e3d9b8;border-radius:12px;padding:12px 14px;font-size:15px}
+.key-ok{font-weight:800;color:#2f7a3d;font-size:15px}
+.mt-sm{margin-top:10px}
+.between{justify-content:space-between;align-items:center}
 .prep-title{font-size:18px;font-weight:800;margin-bottom:14px}
 .pill-row{display:flex;gap:10px;flex-wrap:wrap}
 .pill{flex:1;min-width:220px;background:var(--pill);border-radius:999px;padding:12px 8px 12px 20px;display:flex;align-items:center;justify-content:space-between;gap:8px}
