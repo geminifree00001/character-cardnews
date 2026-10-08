@@ -168,3 +168,9 @@ details.box summary{cursor:pointer;font-weight:700;font-size:14px}
   .pill-row{flex-direction:column}
   .pill{min-width:0}
 }
+
+/* ---------- 장수 선택 ---------- */
+.pagecount-label{font-weight:800;font-size:16px;margin-bottom:10px}
+.pagecount-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.pc-btn{flex:1;min-width:58px;border:2px solid var(--line);background:#fff;border-radius:12px;padding:11px 0;font-size:16px;font-weight:800;color:var(--ink);cursor:pointer}
+.pc-btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
