@@ -110,6 +110,18 @@
 <main>
   <!-- ============ 메인 ============ -->
   <section id="view-main" class="view">
+    <div class="key-box" id="key-box">
+      <div class="key-title">🔑 Gemini API 키</div>
+      <div id="key-input-row" class="row gap">
+        <input id="api-key-main" type="password" placeholder="AIza..." autocomplete="off" class="grow key-input">
+        <button id="btn-save-key-main" class="btn-primary">저장</button>
+      </div>
+      <div id="key-done-row" class="row between" hidden>
+        <span id="key-status" class="key-ok">✅ 키 등록됨</span>
+        <button id="btn-change-key" class="link-btn">바꾸기</button>
+      </div>
+      <p class="hint mt-sm">이 기기에만 저장돼요. 키는 <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a>에서 무료로 발급받으세요.</p>
+    </div>
     <div class="prep-box">
       <div class="prep-title">먼저 3가지만 준비해주세요</div>
       <div class="pill-row">
