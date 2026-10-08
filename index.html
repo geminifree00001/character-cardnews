@@ -13,14 +13,81 @@
 </head>
 <body>
 
-<!-- ============ 처음 설정 오버레이 ============ -->
-<div id="onboard" class="overlay" hidden>
-  <div class="sheet">
-    <h2>처음 설정</h2>
-    <p class="muted">딱 한 번만 하면 돼요. 이 기기에 저장돼요.</p>
-    <div class="row gap">
-      <button id="btn-acct" class="btn-primary big grow">내 계정</button>
-      <button id="btn-code" class="btn-primary big grow">입장코드</button>
+<header class="topbar">
+  <div>
+    <div class="brand">캐릭터 카드뉴스 만들기</div>
+    <div id="setup-sub" class="brand-sub">설정이 필요해요</div>
+  </div>
+  <button id="btn-settings" class="btn-ghost">⚙ 설정</button>
+</header>
+
+<!-- ============ 처음 설정 모달 ============ -->
+<div id="setup-modal" class="overlay" hidden>
+  <div class="sheet wide">
+    <div class="sheet-head">
+      <div>
+        <h2>처음 설정</h2>
+        <p class="muted">딱 한 번만 하면 돼요. 이 기기에 저장돼요.</p>
+      </div>
+      <button id="btn-setup-close" class="btn-ghost">닫기 ×</button>
+    </div>
+    <div class="setup-tabs">
+      <button class="setup-tab active" data-stab="acct">1. 내 계정</button>
+      <button class="setup-tab" data-stab="code">2. 입장코드</button>
+      <button class="setup-tab" data-stab="char">3. 캐릭터</button>
+    </div>
+
+    <div id="stab-acct" class="stabpane">
+      <label class="fld"><span>표시 이름</span>
+        <input id="in-name" type="text" placeholder="예: dd">
+      </label>
+      <p class="hint">카드에 '{이름} · {분야}' 형태로 표시돼요.</p>
+      <button id="btn-save-name" class="btn-primary wide">저장</button>
+    </div>
+
+    <div id="stab-code" class="stabpane" hidden>
+      <label class="fld"><span>입장코드</span>
+        <input id="in-code" type="text" placeholder="코드를 입력하세요">
+      </label>
+      <p class="hint">캐릭터 그리기와 AI 기능 사용에 필요합니다.</p>
+      <button id="btn-save-code" class="btn-primary wide">등록하기</button>
+    </div>
+
+    <div id="stab-char" class="stabpane" hidden>
+      <div class="info-box">모든 카드에 이 캐릭터가 똑같이 나와요. 사진이 있으면 올리고, 없으면 말로 설명해서 AI에게 만들어 달라고 하세요.</div>
+      <div class="card">
+        <div class="card-title" id="setup-char-title">? 아직 캐릭터가 없어요</div>
+        <img id="setup-char-img" class="char-big" hidden alt="내 캐릭터">
+        <div class="row"><button id="btn-setup-clear-char" class="link-btn" hidden>지우고 다시 정하기</button></div>
+      </div>
+      <div class="row gap">
+        <button id="btn-voice-form" class="btn-soft grow">✨ 말로 만들기</button>
+        <button id="btn-photo-upload" class="btn-soft grow">📷 사진 올리기</button>
+        <input type="file" id="file-char" accept="image/*" hidden>
+        <button id="btn-char-example2" class="btn-soft grow">💧 예시 쓰기</button>
+      </div>
+      <div id="char-form" hidden>
+        <div class="card-title-sm">그림 느낌</div>
+        <div class="style-pick">
+          <label><input type="radio" name="char-style" value="style3d" checked><span>3D 애니메이션 (픽사 느낌)</span></label>
+          <label><input type="radio" name="char-style" value="book"><span>귀여운 그림책 일러스트</span></label>
+          <label><input type="radio" name="char-style" value="clay"><span>말랑한 점토 인형</span></label>
+          <label><input type="radio" name="char-style" value="watercolor"><span>따뜻한 수채화</span></label>
+          <label><input type="radio" name="char-style" value="photo"><span>실사 사진 느낌</span></label>
+        </div>
+        <label class="fld"><span>어떤 캐릭터를 원하세요?</span>
+          <span class="hint">생김새, 색깔, 표정을 편하게 적어주세요</span>
+          <textarea id="char-desc" rows="3" placeholder="예: 동글동글한 노란 병아리, 초록색 앞치마를 두르고 환하게 웃는 모습"></textarea>
+        </label>
+        <div id="code-notice" class="notice-yellow" hidden>캐릭터를 그리려면 입장코드가 필요해요. <button id="btn-goto-code" class="link-btn">ⓞ 입장코드 넣으러 가기</button></div>
+        <button id="btn-draw-char" class="btn-primary wide">🎨 캐릭터 그리기</button>
+        <div id="char-preview-wrap" class="preview-wrap" hidden><img id="char-preview" alt="캐릭터 미리보기"></div>
+      </div>
+      <div class="row gap mt">
+        <button id="btn-setup-back" class="btn-ghost grow">← 이전</button>
+        <button id="btn-setup-done" class="btn-blue grow">저장하고 닫기</button>
+      </div>
+      <button id="btn-goto-main" class="btn-blue big wide mt" hidden>설정 끝! 카드뉴스 만들러 가기</button>
     </div>
   </div>
 </div>
@@ -40,128 +107,98 @@
   </div>
 </div>
 
-<!-- ============ 캐릭터 만들기 모달 ============ -->
-<div id="char-modal" class="overlay" hidden>
-  <div class="sheet wide">
-    <h3>🎙 말로 만들기</h3>
-    <p class="hint">어떤 캐릭터를 원하세요? 성격, 색상, 표정을 편하게 적어주세요</p>
-    <textarea id="char-desc" rows="3" placeholder="예: 돈 버는 쥐, 귀엽게"></textarea>
-    <div class="row"><button id="btn-char-example" class="link-btn">예시 쓰기</button></div>
-    <div class="style3">
-      <label><input type="radio" name="char-style" value="clay" checked><span>말랑한 점토 인형</span></label>
-      <label><input type="radio" name="char-style" value="photo"><span>실사 사진 느낌</span></label>
-      <label><input type="radio" name="char-style" value="watercolor"><span>따뜻한 수채화</span></label>
-    </div>
-    <button id="btn-draw-char" class="btn-primary wide">✨ 캐릭터 그리기</button>
-    <div id="char-preview-wrap" class="preview-wrap" hidden>
-      <img id="char-preview" alt="캐릭터 미리보기">
-    </div>
-    <div class="row gap">
-      <button id="btn-save-char" class="btn-primary grow">저장하고 닫기</button>
-      <button id="btn-close-char" class="btn-ghost">닫기</button>
-    </div>
-  </div>
-</div>
-
-<header class="topbar">
-  <div class="brand">🐭 캐릭터 카드뉴스 만들기</div>
-  <button id="btn-settings" class="btn-ghost">⚙ 설정</button>
-</header>
-
 <main>
-  <!-- ============ 1단계: 캐릭터 ============ -->
-  <section id="view-char" class="view">
-    <div class="steptabs">
-      <button class="steptab active" data-tab="make">1. 캐릭터 만들기</button>
-      <button class="steptab" data-tab="tone">2. 말투 배우기</button>
-      <button class="steptab" data-tab="manage">3. 캐릭터 관리하기</button>
-    </div>
-
-    <div id="tab-make" class="tabpane">
-      <div class="card">
-        <div class="card-title">지금 쓰는 캐릭터</div>
-        <div id="active-char-empty" class="empty">아직 캐릭터가 없어요. 아래에서 만들어 보세요.</div>
-        <img id="active-char-img" class="char-big" hidden alt="내 캐릭터">
-        <div class="row">
-          <button id="btn-clear-char" class="btn-ghost" hidden>지우고 다시 정하기</button>
-        </div>
-      </div>
-      <div class="row center gap">
-        <button id="btn-make-voice" class="btn-primary big grow">🎙 말로 만들기</button>
-        <button id="btn-upload-photo" class="btn-soft big grow">🖼 사진 올리기</button>
-        <input type="file" id="file-char" accept="image/*" hidden>
-      </div>
-      <div class="row center">
-        <button id="btn-to-topic" class="btn-primary big wide" disabled>다음: 주제 정하기 →</button>
+  <!-- ============ 메인 ============ -->
+  <section id="view-main" class="view">
+    <div class="prep-box">
+      <div class="prep-title">먼저 3가지만 준비해주세요</div>
+      <div class="pill-row">
+        <div class="pill" id="pill-acct"><span class="pill-label">1. 내 계정 알려주기</span><button class="pill-go" data-go="acct">하러 가기 →</button></div>
+        <div class="pill" id="pill-code"><span class="pill-label">2. 입장코드 넣기</span><button class="pill-go" data-go="code">하러 가기 →</button></div>
+        <div class="pill" id="pill-char"><span class="pill-label">3. 캐릭터 정하기</span><button class="pill-go" data-go="char">하러 가기 →</button></div>
       </div>
     </div>
 
-    <div id="tab-tone" class="tabpane" hidden>
-      <div class="card">
-        <div class="card-title">말투 배우기</div>
-        <p class="muted">준비 중이에요.</p>
+    <div class="sec">
+      <h2><span class="num">①</span> 무엇으로 만들까요?</h2>
+      <p class="muted">셋 중 편한 방법 하나를 고르세요.</p>
+      <div class="opt-cards">
+        <button class="opt-card sel" data-src="recommend"><div class="opt-t">✨ 주제 추천받기</div><div class="opt-s">뭘 만들지 모르겠을 때</div></button>
+        <button class="opt-card" data-src="link"><div class="opt-t">🔗 링크 넣기</div><div class="opt-s">참고할 글·영상이 있을 때</div></button>
+        <button class="opt-card" data-src="direct"><div class="opt-t">✍️ 주제 직접 쓰기</div><div class="opt-s">만들 주제가 정해졌을 때</div></button>
+      </div>
+      <label class="fld"><span>(안 써도 돼요) 원하는 방향 — 예: 요즘 날씨에 맞게, 초보자용</span>
+        <input id="src-direction" type="text" placeholder="예: 요즘 날씨에 맞게, 초보자용">
+      </label>
+      <div id="src-link-panel" class="panel" hidden>
+        <label class="fld"><span>참고 링크</span><input id="in-link" type="url" placeholder="https://"></label>
+        <button id="btn-link-go" class="btn-primary wide">분석해서 만들기</button>
+      </div>
+      <div id="src-direct-panel" class="panel" hidden>
+        <label class="fld"><span>주제</span><textarea id="in-direct-topic" rows="3" placeholder="만들고 싶은 주제를 적어주세요"></textarea></label>
+        <button id="btn-direct-go" class="btn-primary wide">이 주제로 만들기</button>
       </div>
     </div>
 
-    <div id="tab-manage" class="tabpane" hidden>
-      <div class="card">
-        <div class="card-title">캐릭터 관리하기</div>
-        <div id="char-grid" class="char-grid"></div>
-      </div>
+    <div class="sec">
+      <h2><span class="num">②</span> 어떤 모양으로 만들까요?</h2>
+      <p class="muted">잘 모르겠으면 'AI가 알아서'를 두세요.</p>
+      <div id="shape-grid" class="shape-grid"></div>
     </div>
+
+    <button id="btn-main-topics" class="btn-blue big wide" disabled>✨ 주제 5개 추천받기</button>
+    <p id="prep-need" class="need-note">위의 준비 3가지를 먼저 끝내주세요.</p>
   </section>
 
-  <!-- ============ 2단계: 주제 추천 ============ -->
-  <section id="view-topic" class="view" hidden>
-    <h2>어떤 주제로 만들까요?</h2>
+  <!-- ============ 주제 추천 ============ -->
+  <section id="view-topics" class="view" hidden>
     <button id="btn-topics" class="btn-blue big wide">✨ 주제 5개 추천받기</button>
+    <h2 class="pick-title">마음에 드는 주제를 눌러주세요 👇</h2>
     <div id="topic-list" class="topic-list"></div>
-    <div class="row"><button id="btn-back-char" class="btn-ghost">← 캐릭터로 돌아가기</button></div>
+    <div class="row"><button id="btn-back-main" class="btn-ghost">← 처음으로 돌아가기</button></div>
   </section>
 
-  <!-- ============ 3단계: 모양 선택 ============ -->
-  <section id="view-shape" class="view" hidden>
-    <h2>어떤 모양으로 만들까요?</h2>
-    <p class="muted">잘 모르겠으면 'AI가 알아서 골라주기'</p>
-    <div id="shape-list" class="shape-list"></div>
-    <div class="row"><button id="btn-back-topic" class="btn-ghost">← 주제로 돌아가기</button></div>
-  </section>
-
-  <!-- ============ 4단계: 팩트체크 ============ -->
-  <section id="view-fact" class="view" hidden>
-    <h2>팩트체크</h2>
-    <div id="fact-loading" class="card center">
-      <div class="spinner"></div>
-      <p>사실인지 검색해서 확인하고 있어요...<br>(2~3분 걸려요. 창을 닫지 마세요)</p>
+  <!-- ============ 요약 ============ -->
+  <section id="view-summary" class="view" hidden>
+    <header class="editor-head">
+      <div class="brand">캐릭터 카드뉴스 만들기</div>
+      <button id="btn-settings2" class="btn-ghost">⚙ 설정</button>
+    </header>
+    <div class="card">
+      <div id="sum-format" class="topic-format"></div>
+      <div id="sum-title" class="sum-title"></div>
+      <p id="sum-reason" class="sum-reason"></p>
     </div>
-    <div id="fact-result" class="card" hidden>
-      <div class="card-title">확인된 핵심 내용</div>
-      <ul id="fact-list" class="fact-list"></ul>
-      <button id="btn-start-cards" class="btn-primary big wide">카드 만들기 시작</button>
-    </div>
-    <div class="row"><button id="btn-back-shape" class="btn-ghost">← 모양으로 돌아가기</button></div>
+    <button id="btn-draw9" class="btn-blue big wide">🎨 그림 9장 한 번에 그리기</button>
+    <p class="hint center">글자는 아래에서 바로 고칠 수 있어요. 고치면 그림에 바로 반영돼요.</p>
+    <div id="sum-loading" class="loading-black" hidden>○ 글을 쓰고 있어요... (2~3분 걸려요. 창을 닫지 마세요)</div>
+    <div class="row"><button id="btn-back-topics" class="btn-ghost">← 주제로 돌아가기</button></div>
   </section>
 
-  <!-- ============ 5단계: 카드뉴스 편집 (9장) ============ -->
+  <!-- ============ 카드뉴스 편집 (9장) ============ -->
   <section id="view-editor" class="view" hidden>
     <header class="editor-head">
-      <div class="brand">🐭 캐릭터 카드뉴스 만들기</div>
-      <div class="row gap">
-        <button id="btn-use-photo" class="btn-ghost">내 사진으로</button>
-        <input type="file" id="file-card-photo" accept="image/*" hidden>
-        <button id="btn-save-page" class="btn-primary">💾 이 장 저장</button>
-        <button id="btn-save-all" class="btn-soft">📦 전체 저장</button>
-      </div>
+      <div class="brand">캐릭터 카드뉴스 만들기</div>
+      <button id="btn-save-all" class="btn-soft">📦 전체 저장</button>
     </header>
     <div class="pager">
       <button id="btn-prev" class="btn-ghost">← 이전</button>
-      <div id="page-label" class="page-label">1번째 장 / 9장</div>
+      <div class="pager-mid">
+        <div id="page-label" class="page-label">1번째 장 / 9장</div>
+        <div id="page-dots" class="dots"></div>
+      </div>
       <button id="btn-next" class="btn-ghost">다음 →</button>
     </div>
     <div id="img-progress" class="img-progress" hidden></div>
     <div class="editor-grid">
       <div class="preview-col">
         <canvas id="preview" width="1080" height="1350"></canvas>
+        <div class="row gap center">
+          <button id="btn-redraw" class="btn-soft grow">🎨 이 장 그림 그리기</button>
+          <button id="btn-use-photo" class="btn-ghost">📷 내 사진으로</button>
+          <input type="file" id="file-card-photo" accept="image/*" hidden>
+          <button id="btn-save-page" class="btn-primary">💾 이 장 저장</button>
+        </div>
         <p class="hint">🖍 [고른 글자 강조]를 켜고 미리보기에서 드래그하면 글자가 노랗게 칠해져요. 큰 제목의 [[ ]]로 감싼 글자는 자동으로 강조돼요.</p>
       </div>
       <div class="control-col">
@@ -171,13 +208,14 @@
           <button id="btn-hl-mode" class="btn-soft">🖍 고른 글자 강조</button>
           <button id="btn-hl-clear" class="link-btn">강조 초기화</button>
         </div>
+        <p class="hint">← 글자를 드래그해서 고르고 누르면 강조색이 돼요.</p>
         <details class="box">
           <summary>🎨 더 꾸미기 (색·표시·그림 설명)</summary>
           <div class="card-title-sm">바탕 아래쪽 색</div>
           <div id="bg-colors" class="color-row"></div>
+          <label class="fld"><span>도장 표시</span><input id="in-stamp" type="text" placeholder="예: 건강정보"></label>
           <p id="scene-hint" class="hint"></p>
         </details>
-        <button id="btn-redraw" class="btn-soft wide">🔄 그림 다시 그리기</button>
       </div>
     </div>
   </section>
