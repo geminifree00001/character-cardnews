@@ -35,11 +35,14 @@ input,select,textarea{font-family:inherit}
 .btn-blue:hover{background:var(--blue-dark)}
 .btn-blue.big{font-size:21px;padding:18px}
 .btn-blue.wide{width:100%}
-.btn-soft{background:var(--purple-soft);color:var(--purple-dark);border:0;border-radius:12px;padding:11px 16px;font-size:15px;font-weight:700}
+.btn-soft{background:var(--purple-soft);color:var(--purple-dark);border:2px solid transparent;border-radius:12px;padding:11px 16px;font-size:15px;font-weight:700}
 .btn-soft:hover{background:#e2d4ff}
+.btn-soft.sel{border:2px solid var(--blue);background:var(--blue-soft);color:var(--ink)}
 .btn-soft.big{font-size:18px;padding:16px}
 .btn-soft.wide{width:100%}
 .btn-soft.active{background:var(--yellow);color:var(--ink)}
+.btn-yellow{background:var(--yellow);color:var(--ink);border:0;border-radius:12px;padding:11px 16px;font-size:15px;font-weight:700}
+.btn-yellow.active{background:var(--ink);color:#fff}
 .btn-ghost{background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 16px;font-weight:700}
 .link-btn{background:none;border:0;color:var(--purple);font-weight:700;font-size:14px;padding:0}
 
@@ -122,6 +125,7 @@ main{padding:26px;max-width:1100px;margin:0 auto}
 .topic-go{background:none;border:0;color:var(--blue);font-weight:800;font-size:15px;text-align:left;padding:0}
 
 /* 요약 */
+.sum-format{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:2px}
 .sum-title{font-size:24px;font-weight:800;margin:12px 0 8px;line-height:1.4}
 .sum-reason{font-size:15px;line-height:1.8;color:#333;background:#f8f7ff;border-radius:12px;padding:14px 16px;margin:0}
 .loading-black{background:#14141c;color:#fff;border-radius:16px;padding:20px;text-align:center;font-weight:700;font-size:16px;margin:14px 0}
