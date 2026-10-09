@@ -150,7 +150,7 @@ const SHAPES = [
   { key: 'steps',      label: '🪜 단계별 따라하기',      sub: '예) 처음이라면 이 순서대로' },
   { key: 'qa',         label: '🙋 자주 묻는 질문 Q&A',  sub: '예) 많이 물어보시는 질문 모음' },
   { key: 'quiz',       label: '❓ 퀴즈 풀기',            sub: '예) 3문제 다 맞히면 전문가!' },
-  { key: 'mistakes',   label: '🐥 흔한 실수 모음',      sub: '예) 나도 모르게 하던 실수' },
+  { key: 'mistakes',   label: '🐣 흔한 실수 모음',      sub: '예) 나도 모르게 하던 실수' },
   { key: 'routine',    label: '⏰ 하루 루틴',            sub: '예) 아침부터 밤까지 이렇게' },
   { key: 'numbers',    label: '🔢 숫자로 알아보기',     sub: '예) 숫자로 보면 깜짝 놀라요' },
   { key: 'comfort',    label: '🤗 공감·위로',           sub: '예) 혹시 나만 이런가요?' },
@@ -189,7 +189,7 @@ const PROMPT_TOPICS = (direction) =>
 원하는 방향: ${direction || '없음'}
 조건: 20~40대 여성이 저장·공유하고 싶은 생활 밀착형 주제. 번역투·기계체 금지, 한국 인스타 바이럴 채널의 자연스러운 구어체.
 각 주제의 형식(format)은 아래 중 하나를 골라 정확히 그대로 써줘:
-"🪄 AI가 알아서 골라주기", "⚠️ 이런 습관 조심", "⭕ 진짜? 가짜? (O/X)", "🔄 이렇게 말고 이렇게", "💡 꿀팁 모음", "✅ 자가진단 체크리스트", "🏆 순위 TOP 5", "🪜 단계별 따라하기", "🙋 자주 묻는 질문 Q&A", "❓ 퀴즈 풀기", "🐥 흔한 실수 모음", "⏰ 하루 루틴", "🔢 숫자로 알아보기", "🤗 공감·위로", "📖 이야기로 풀기", "💬 대화형 (묻고 답하기)", "📚 어려운 말 쉽게", "🎯 상황별 추천", "🍂 계절·시기 가이드", "📰 요즘 이슈 정리", "🔄 전과 후 비교"
+"🪄 AI가 알아서 골라주기", "⚠️ 이런 습관 조심", "⭕ 진짜? 가짜? (O/X)", "🔄 이렇게 말고 이렇게", "💡 꿀팁 모음", "✅ 자가진단 체크리스트", "🏆 순위 TOP 5", "🪜 단계별 따라하기", "🙋 자주 묻는 질문 Q&A", "❓ 퀴즈 풀기", "🐣 흔한 실수 모음", "⏰ 하루 루틴", "🔢 숫자로 알아보기", "🤗 공감·위로", "📖 이야기로 풀기", "💬 대화형 (묻고 답하기)", "📚 어려운 말 쉽게", "🎯 상황별 추천", "🍂 계절·시기 가이드", "📰 요즘 이슈 정리", "🔄 전과 후 비교"
 반드시 아래 JSON으로만 답해. 다른 말은 쓰지 마.
 {"topics":[
   {"format":"형식","title":"제목","hook":"훅 문장","reason":"선택 이유 1줄"},
@@ -284,6 +284,8 @@ function updateSetupTabChecks() {
     b.textContent = (done[t] ? '✅ ' : '') + labels[t];
   });
   $('code-notice').hidden = !!S.code;
+  const db = $('btn-draw-char');
+  if (db) db.disabled = !S.code;
 }
 function openSetup(tab) {
   $('in-name').value = S.name;
@@ -328,7 +330,11 @@ function initSetup() {
   on('btn-goto-code', 'click', () => setupTab('code'));
 
   /* 탭3: 캐릭터 */
-  on('btn-voice-form', 'click', () => { $('char-form').hidden = !$('char-form').hidden; });
+  on('btn-voice-form', 'click', () => {
+    const f = $('char-form');
+    f.hidden = !f.hidden;
+    $('btn-voice-form').classList.toggle('sel', !f.hidden);
+  });
   on('btn-char-example2', 'click', () => {
     $('char-form').hidden = false;
     $('char-desc').value = '동글동글한 노란 병아리, 초록색 앞치마를 두르고 환하게 웃는 모습';
@@ -804,7 +810,7 @@ function canvasToBlob(cv) {
 
 function initEditor() {
   on('btn-prev', 'click', () => { if (S.page > 0) { S.page--; renderPage(); } });
-  on('btn-next', 'click', () => { if (S.page < 8) { S.page++; renderPage(); } });
+  on('btn-next', 'click', () => { if (S.page < S.cards.length - 1) { S.page++; renderPage(); } });
   on('in-title', 'input', () => {
     const c = S.cards[S.page]; if (!c) return;
     c.title = $('in-title').value;
